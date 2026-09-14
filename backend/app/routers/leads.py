@@ -19,6 +19,7 @@ from app.database import get_db
 from app.schemas.lead import LeadFilterOptions, LeadListResponse, LeadResponse, LeadUpdate
 from app.services.lead_service import (
     export_leads_csv,
+    get_dashboard,
     get_filter_options,
     get_lead_by_id,
     search_leads,
@@ -105,6 +106,12 @@ def export_leads(
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=leads_export.csv"},
     )
+
+
+@router.get("/dashboard")
+def dashboard(db: Session = Depends(get_db)):
+    """Lead counts by status and by source channel."""
+    return get_dashboard(db)
 
 
 @router.get("/{record_id}", response_model=LeadResponse)

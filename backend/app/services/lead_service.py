@@ -117,6 +117,28 @@ def get_lead_by_id(db: Session, record_id: str) -> Optional[Lead]:
     return db.query(Lead).filter(Lead.record_id == record_id).first()
 
 
+def get_dashboard(db: Session) -> dict:
+    """Lead counts grouped by status and by source channel."""
+    from sqlalchemy import func
+
+    by_status = dict(
+        db.query(Lead.lead_status, func.count())
+        .group_by(Lead.lead_status)
+        .all()
+    )
+    by_source = dict(
+        db.query(Lead.original_source, func.count())
+        .group_by(Lead.original_source)
+        .all()
+    )
+
+    # Replace None keys with "unset" for cleaner JSON
+    by_status = {k or "unset": v for k, v in by_status.items()}
+    by_source = {k or "unset": v for k, v in by_source.items()}
+
+    return {"by_status": by_status, "by_source": by_source}
+
+
 def get_filter_options(db: Session) -> dict:
     """
     Ambil daftar nilai unik untuk lead_status dan country_region yang

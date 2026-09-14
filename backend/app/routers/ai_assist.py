@@ -21,7 +21,7 @@ from app.schemas.ai_assist import (
 from app.services.ai_assist_service import ai_dedupe, ai_extraction
 from app.services.lead_service import get_lead_by_id
 
-router = APIRouter(prefix="/leads", tags=["ai-assist"])
+router = APIRouter(prefix="/leads")
 
 
 @router.post("/dedupe-candidates", response_model=DedupeCandidatesResponse)

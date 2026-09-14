@@ -80,6 +80,7 @@
     <button class="tab" :class="tab==='ingest'&&'on'" @click="tab='ingest'">Ingest</button>
     <button class="tab" :class="tab==='dedupe'&&'on'" @click="tab='dedupe'">Dedupe</button>
     <button class="tab" :class="tab==='extract'&&'on'" @click="tab='extract'">Extract</button>
+    <button class="tab" :class="tab==='dashboard'&&'on'" @click="tab='dashboard',fetchDashboard()">Dashboard</button>
   </div>
 
   <!-- ==================== LEADS ==================== -->
@@ -300,6 +301,45 @@
     </div>
   </div>
 
+  <!-- ==================== DASHBOARD ==================== -->
+  <div x-show="tab==='dashboard'" class="main" style="padding:16px">
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+
+      <!-- By Status -->
+      <div class="card" style="padding:14px;flex:1;min-width:280px">
+        <div class="section-title">Leads by Status</div>
+        <table class="tbl">
+          <thead><tr><th>Status</th><th style="text-align:right">Count</th></tr></thead>
+          <tbody>
+            <template x-for="[status, count] in Object.entries(dash.by_status || {})" :key="status">
+              <tr>
+                <td><span class="badge" :class="status!=='unset'?'b-acc':'b-n'" x-text="status"></span></td>
+                <td style="text-align:right;font-weight:500" x-text="count"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- By Source -->
+      <div class="card" style="padding:14px;flex:1;min-width:280px">
+        <div class="section-title">Leads by Source Channel</div>
+        <table class="tbl">
+          <thead><tr><th>Source</th><th style="text-align:right">Count</th></tr></thead>
+          <tbody>
+            <template x-for="[source, count] in Object.entries(dash.by_source || {})" :key="source">
+              <tr>
+                <td><span class="badge b-n" x-text="source"></span></td>
+                <td style="text-align:right;font-weight:500" x-text="count"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -321,6 +361,8 @@ function app(){
     ddAll:[],ddLoading:false,ddLlm:false,ddMethodFilter:'',ddPage:1,ddPs:6,ddSummary:null,
 
     exText:'',exRes:null,exId:'',exErr:null,
+
+    dash:{by_status:{},by_source:{}},
 
     async init(){
       this.go();
@@ -429,6 +471,11 @@ function app(){
       const r=await fetch(`${A}/${this.exId}/extract-source`);
       if(!r.ok){this.exErr=`Lead '${this.exId}' not found.`;return}
       this.exRes=await r.json();
+    },
+
+    async fetchDashboard(){
+      const r=await fetch(`${A}/dashboard`);
+      this.dash=await r.json();
     },
   }
 }
