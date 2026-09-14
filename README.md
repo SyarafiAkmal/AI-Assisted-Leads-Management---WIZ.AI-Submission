@@ -51,33 +51,33 @@ The frontend is a single-page app served at `http://localhost:8000`, built with 
 
 | Feature | How to use | Screenshot |
 |---|---|---|
-| **Browse leads** | All 2,049 leads are displayed in a paginated table (15 per page). Scroll horizontally to see all 14 columns. Use Prev/Next at the bottom to navigate pages. | ![Leads tab](docs/leads_tab.png) |
-| **Filter & search** | Use the search bar for free-text search across name, company, email, and notes. Use the Status and Country dropdowns to filter by specific values. The Owner field accepts partial text input. Click **Search** to apply. Filters are AND-combined. | ![Filter](docs/leads_filter.png) |
-| **Edit a lead** | Click a lead's **name** (highlighted in orange) to open the edit modal. You can update Status, Contact Owner, and Notes. Click **Save changes** to persist via `PATCH`. | ![Edit modal](docs/leads_edit.png) |
-| **Extract source from edit** | While the edit modal is open, click **Extract source** to run source extraction on that lead's notes. The detected channel and detail appear below the buttons. | ![Extract in edit](docs/leads_edit.png) |
-| **Export CSV** | Click **Export CSV** in the filter bar. It downloads a `.csv` file containing all leads matching the current filters (not just the current page), with all columns. Null values are written as the literal string `"null"`. | ![Export](docs/leads_export.png) |
+| **Browse leads** | All 2,049 leads are displayed in a paginated table (15 per page). Scroll horizontally to see all 14 columns. Use Prev/Next at the bottom to navigate pages. | ![Leads tab](backend/docs/leads_tab.png) |
+| **Filter & search** | Use the search bar for free-text search across name, company, email, and notes. Use the Status and Country dropdowns to filter by specific values. The Owner field accepts partial text input. Click **Search** to apply. Filters are AND-combined. | ![Filter](backend/docs/leads_filter.png) |
+| **Edit a lead** | Click a lead's **name** (highlighted in orange) to open the edit modal. You can update Status, Contact Owner, and Notes. Click **Save changes** to persist via `PATCH`. | ![Edit modal](backend/docs/leads_edit.png) |
+| **Extract source from edit** | While the edit modal is open, click **Extract source** to run source extraction on that lead's notes. The detected channel and detail appear below the buttons. | ![Extract in edit](backend/docs/leads_edit.png) |
+| **Export CSV** | Click **Export CSV** in the filter bar. It downloads a `.csv` file containing all leads matching the current filters (not just the current page), with all columns. Null values are written as the literal string `"null"`. | ![Export](backend/docs/leads_export.png) |
 
 #### Ingest Tab
 
 | Feature | How to use | Screenshot |
 |---|---|---|
-| **Single lead** | Fill in the form fields (Name, Company, Email, Phone, Country, Form name, Form ID, Page URL, Message) and click **Submit lead**. A confirmation card shows the new `record_id`. | ![Single ingest](docs/ingest_single.png) |
-| **Bulk ingest from JSON** | Click **Choose JSON file** and select a `.json` file containing an array of lead objects (same shape as `website_form_submissions.json`). The button updates to show how many leads were parsed. Click **Submit X leads** to ingest them sequentially. A summary shows how many succeeded/failed. | ![Bulk ingest](docs/ingest_bulk.png) |
+| **Single lead** | Fill in the form fields (Name, Company, Email, Phone, Country, Form name, Form ID, Page URL, Message) and click **Submit lead**. A confirmation card shows the new `record_id`. | ![Single ingest](backend/docs/ingest_single.png) |
+| **Bulk ingest from JSON** | Click **Choose JSON file** and select a `.json` file containing an array of lead objects (same shape as `website_form_submissions.json`). The button updates to show how many leads were parsed. Click **Submit X leads** to ingest them sequentially. A summary shows how many succeeded/failed. | ![Bulk ingest](backend/docs/ingest_bulk.png) |
 
 #### Dedupe Tab
 
 | Feature | How to use | Screenshot |
 |---|---|---|
-| **Run dedupe scan** | Click **Run dedupe scan** to execute steps 1 (phone/email blocking) and 2 (fuzzy similarity). Results appear as a table showing Lead 1, Lead 2, Score, and Method. The total pair count is shown top-right. | ![Dedupe scan](docs/dedupe_scan.png) |
-| **Filter by method** | Use the **All methods** dropdown to show only pairs detected by a specific method (`phone_blocking`, `fuzzy_similarity`, `llm_name_match`). | ![Dedupe scan](docs/dedupe_scan.png) |
-| **Enable LLM filter** | Toggle the **LLM Filter** switch ON before clicking Run. This activates step 3: the LLM evaluates ~110 name-match candidates in batches. After completion, a summary card appears above the table describing the LLM's findings (how many evaluated, how many passed, average score, and general pattern). Pairs that passed the LLM threshold appear with method `llm_name_match` and an explanation in the LLM Reason column. | ![Dedupe LLM](docs/dedupe_llm.png) |
+| **Run dedupe scan** | Click **Run dedupe scan** to execute steps 1 (phone/email blocking) and 2 (fuzzy similarity). Results appear as a table showing Lead 1, Lead 2, Score, and Method. The total pair count is shown top-right. | ![Dedupe scan](backend/docs/dedupe_scan.png) |
+| **Filter by method** | Use the **All methods** dropdown to show only pairs detected by a specific method (`phone_blocking`, `fuzzy_similarity`, `llm_name_match`). | ![Dedupe scan](backend/docs/dedupe_scan_filter.png) |
+| **Enable LLM filter** | Toggle the **LLM Filter** switch ON before clicking Run. This activates step 3: the LLM evaluates ~110 name-match candidates in batches. After completion, a summary card appears above the table describing the LLM's findings (how many evaluated, how many passed, average score, and general pattern). Pairs that passed the LLM threshold appear with method `llm_name_match` and an explanation in the LLM Reason column. | ![Dedupe LLM](backend/docs/dedupe_llm.png) |
 
 #### Extract Tab
 
 | Feature | How to use | Screenshot |
 |---|---|---|
-| **Look up by record ID** | Enter a `record_id` (e.g. `100234811`) in the top card and click **Look up**. The system fetches that lead's notes and original_source from the database and runs the 3-layer extraction pipeline. The result shows the detected channel badge and detail text. | ![Extract by ID](docs/extract_id.png) |
-| **Extract from raw text** | Type or paste any text into the **Raw text** textarea and click **Extract**. Useful for testing extraction on arbitrary text without needing a database record. | ![Extract from text](docs/extract_text.png) |
+| **Look up by record ID** | Enter a `record_id` (e.g. `100234811`) in the top card and click **Look up**. The system fetches that lead's notes and original_source from the database and runs the 3-layer extraction pipeline. The result shows the detected channel badge and detail text. | ![Extract by ID](backend/docs/extract_id.png) |
+| **Extract from raw text** | Type or paste any text into the **Raw text** textarea and click **Extract**. Useful for testing extraction on arbitrary text without needing a database record. | ![Extract from text](backend/docs/extract_text.png) |
 ---
 
 ## Project Structure
