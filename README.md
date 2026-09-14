@@ -21,7 +21,7 @@ cd backend
 python data/generate_seed.py data/leads_seed.csv data/leads_seed.sql
 cd ..
 ```
-3. Add your LLM API key to a .env file (optional — see LLM section below)
+3. Add your LLM API key to a .env file (optional — see LLM section below) (There is also .env.example, **please use it as a reference**)
 ```bash
 echo "LLM_PROVIDER=openai" >> .env
 echo "LLM_MODEL=gpt-4o-mini" >> .env
