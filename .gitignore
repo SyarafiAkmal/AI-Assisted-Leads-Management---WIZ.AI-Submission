@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Environment
+.env
+
+# Node (from accidental npm init / pytest install)
+node_modules/
+package.json
+package-lock.json
+
+# Generated files
+backend/data/leads_seed.sql
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+pgdata/

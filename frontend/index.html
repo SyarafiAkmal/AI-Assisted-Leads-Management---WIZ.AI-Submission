@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Assisted Leads Management</title>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Space+Grotesk:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<style>
+  :root{
+    --bg:#17110E;--panel:#211A16;--elev:#2A211C;
+    --brd:#3A2E27;--t1:#F3EAE2;--t2:#C9B8AC;--tm:#8A7D73;
+    --acc:#E8642B;--acc-t:#2B1006;--acc-s:rgba(232,100,43,0.15);
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--t1);font:12px/1.5 'Space Grotesk',sans-serif}
+  .logo{font-family:'Fraunces',serif;font-weight:600;font-size:18px}
+
+  .btn{background:var(--acc);border:none;border-radius:6px;padding:6px 14px;font:500 12px/1 'Space Grotesk',sans-serif;color:var(--acc-t);cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn-s{background:var(--elev);border:.5px solid var(--brd);color:var(--t1);border-radius:6px;padding:5px 12px;font:500 12px/1 'Space Grotesk',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .btn-s:disabled{opacity:.35;cursor:not-allowed}
+
+  input,select,textarea{background:var(--panel);border:.5px solid var(--brd);border-radius:6px;color:var(--t1);padding:5px 8px;font:12px 'Space Grotesk',sans-serif;width:100%}
+  select{padding-right:24px}
+  label{font-size:11px;color:var(--t1);display:block;margin-bottom:2px;font-weight:500}
+
+  .tab{background:none;border:none;color:var(--t2);font:500 12px/1 'Space Grotesk',sans-serif;padding:8px 12px;cursor:pointer;border-bottom:2px solid transparent}
+  .tab.on{color:var(--t1);border-bottom-color:var(--acc)}
+
+  .badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:12px;display:inline-block;white-space:nowrap}
+  .b-acc{background:var(--acc-s);color:#F2A87E}
+  .b-n{background:var(--elev);color:var(--t2)}
+
+  .card{border:.5px solid var(--brd);border-radius:8px;background:var(--panel)}
+  .err{color:#F0997B;font-size:11px;margin-top:4px}
+  .section-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:10px}
+
+  .tbl{width:100%;border-collapse:collapse}
+  .tbl th{text-align:left;font-size:10px;font-weight:600;color:var(--t1);padding:6px 8px;border-bottom:.5px solid var(--brd);position:sticky;top:0;background:var(--panel);z-index:1}
+  .tbl td{padding:6px 8px;border-bottom:.5px solid var(--brd);color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;font-size:11px}
+  .tbl tr:hover td{background:var(--elev)}
+
+  .eg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .wrap{display:flex;flex-direction:column;height:100vh}
+  .main{flex:1;overflow:auto;padding:0}
+  .bar{display:flex;align-items:center;gap:6px;padding:8px 16px;flex-wrap:wrap}
+  .foot{display:flex;justify-content:space-between;align-items:center;padding:6px 16px;font-size:11px;color:var(--tm);border-top:.5px solid var(--brd);flex-shrink:0}
+
+  .file-wrap{position:relative;display:inline-flex;align-items:center;gap:8px}
+  .file-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2}
+  .file-label{display:inline-flex;align-items:center;gap:5px;background:var(--elev);border:.5px solid var(--brd);color:var(--t1);border-radius:6px;padding:6px 14px;font:500 12px/1 'Space Grotesk',sans-serif;cursor:pointer}
+  .file-name{font-size:11px;color:var(--t2)}
+
+  .toggle{position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0}
+  .toggle input{opacity:0;width:0;height:0;position:absolute}
+  .toggle .slider{position:absolute;inset:0;background:var(--brd);border-radius:9px;transition:.2s;cursor:pointer}
+  .toggle .slider::before{content:'';position:absolute;left:2px;top:2px;width:14px;height:14px;background:var(--t2);border-radius:50%;transition:.2s}
+  .toggle input:checked+.slider{background:var(--acc)}
+  .toggle input:checked+.slider::before{transform:translateX(16px);background:var(--t1)}
+
+  .summary-card{border:.5px solid var(--brd);border-left:2px solid var(--acc);border-radius:8px;background:var(--panel);padding:10px 14px;margin:0 16px 10px}
+</style>
+</head>
+<body>
+
+<div class="wrap" x-data="app()" x-init="init()">
+
+  <div style="display:flex;align-items:center;padding:8px 16px;border-bottom:.5px solid var(--brd);flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:22px;height:22px;border-radius:6px;background:var(--acc)"></div>
+      <span class="logo">AI Assisted Leads Management</span>
+    </div>
+  </div>
+
+  <div style="display:flex;padding:0 16px;border-bottom:.5px solid var(--brd);gap:2px;flex-shrink:0">
+    <button class="tab" :class="tab==='leads'&&'on'" @click="tab='leads'">Leads</button>
+    <button class="tab" :class="tab==='ingest'&&'on'" @click="tab='ingest'">Ingest</button>
+    <button class="tab" :class="tab==='dedupe'&&'on'" @click="tab='dedupe'">Dedupe</button>
+    <button class="tab" :class="tab==='extract'&&'on'" @click="tab='extract'">Extract</button>
+  </div>
+
+  <!-- ==================== LEADS ==================== -->
+  <div x-show="tab==='leads'" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div class="bar">
+      <input style="flex:1;min-width:160px" placeholder="Search name, company, email..." x-model="f.q" @keyup.enter="page=1,go()">
+      <select style="width:130px" x-model="f.lead_status" @change="page=1,go()">
+        <option value="">All statuses</option>
+        <template x-for="s in fo.statuses"><option :value="s" x-text="s"></option></template>
+      </select>
+      <select style="width:130px" x-model="f.country_region" @change="page=1,go()">
+        <option value="">All countries</option>
+        <template x-for="c in fo.countries"><option :value="c" x-text="c"></option></template>
+      </select>
+      <input style="width:110px" placeholder="Owner" x-model="f.contact_owner" @keyup.enter="page=1,go()">
+      <button class="btn" @click="page=1,go()">Search</button>
+      <button class="btn-s" @click="exportCsv()"><i class="ti ti-download" style="font-size:13px" aria-hidden="true"></i>Export CSV</button>
+    </div>
+
+    <div style="flex:1;overflow:auto;padding:0 16px">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th style="min-width:110px">Name</th>
+            <th style="min-width:100px">Job title</th>
+            <th style="min-width:130px">Company</th>
+            <th style="min-width:170px">Email</th>
+            <th style="min-width:120px">Phone</th>
+            <th style="min-width:80px">Country</th>
+            <th style="min-width:80px">Status</th>
+            <th style="min-width:100px">Lifecycle</th>
+            <th style="min-width:90px">Source</th>
+            <th style="min-width:100px">Owner</th>
+            <th style="min-width:85px">Created</th>
+            <th style="min-width:85px">Modified</th>
+            <th style="min-width:180px">Notes</th>
+            <th style="min-width:50px">Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr x-show="loading"><td colspan="14" style="color:var(--tm);padding:16px">Loading...</td></tr>
+          <tr x-show="!loading&&leads.length===0"><td colspan="14" style="color:var(--tm);padding:16px">No leads found.</td></tr>
+          <template x-for="lead in leads" :key="lead.record_id">
+            <tr>
+              <td style="cursor:pointer;color:var(--acc)" @click="startEdit(lead)" x-text="lead.name||'—'"></td>
+              <td x-text="lead.job_title||'—'"></td>
+              <td x-text="lead.company_name||'—'"></td>
+              <td x-text="lead.email||'—'"></td>
+              <td x-text="lead.phone_number||'—'"></td>
+              <td x-text="lead.country_region||'—'"></td>
+              <td><span class="badge" :class="lead.lead_status?'b-acc':'b-n'" x-text="lead.lead_status||'—'"></span></td>
+              <td x-text="lead.lifecycle_stage||'—'"></td>
+              <td x-text="lead.original_source||'—'"></td>
+              <td x-text="lead.contact_owner||'—'"></td>
+              <td x-text="lead.create_date||'—'"></td>
+              <td x-text="lead.last_modified_date||'—'"></td>
+              <td x-text="lead.notes||'—'"></td>
+              <td x-text="lead.lead_score??'—'"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="foot">
+      <span x-text="`${total} leads — page ${page}`"></span>
+      <div style="display:flex;gap:6px">
+        <button class="btn-s" @click="page--,go()" :disabled="page<=1">Prev</button>
+        <button class="btn-s" @click="page++,go()" :disabled="leads.length<ps">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div x-show="editId" @click.self="editId=null" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:50">
+    <div class="card" style="padding:16px;width:420px;max-height:80vh;overflow-y:auto" @click.stop>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-weight:600" x-text="'Edit: '+(editData.name||editData.record_id)"></span>
+        <button class="btn-s" @click="editId=null" style="padding:3px 8px">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div><label>Status</label><input x-model="editData.lead_status"></div>
+        <div><label>Contact owner</label><input x-model="editData.contact_owner"></div>
+        <div><label>Notes</label><textarea rows="3" x-model="editData.notes"></textarea></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn" @click="saveEdit()">Save changes</button>
+        <button class="btn-s" @click="extractForEdit()">Extract source</button>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--t2)" x-show="editExtract" x-text="editExtract"></div>
+    </div>
+  </div>
+
+  <!-- ==================== INGEST ==================== -->
+  <div x-show="tab==='ingest'" class="main" style="padding:16px">
+    <div style="max-width:420px">
+      <div class="section-title">Single lead</div>
+      <div class="eg" style="grid-template-columns:1fr 1fr">
+        <div><label>Name</label><input x-model="ig.name"></div>
+        <div><label>Company</label><input x-model="ig.company"></div>
+        <div><label>Email</label><input x-model="ig.email"></div>
+        <div><label>Phone</label><input x-model="ig.phone"></div>
+        <div><label>Country</label><input x-model="ig.country"></div>
+        <div><label>Form name</label><input x-model="ig.form_name" placeholder="Contact Us"></div>
+        <div><label>Form ID</label><input x-model="ig.form_id" placeholder="form_contact_general"></div>
+        <div><label>Page URL</label><input x-model="ig.page_url" placeholder="/pricing"></div>
+      </div>
+      <div style="margin-top:6px"><label>Message</label><textarea rows="2" x-model="ig.message"></textarea></div>
+      <button class="btn" style="margin-top:8px" @click="submitSingle()">Submit lead</button>
+      <div class="err" x-show="igErr" x-text="igErr"></div>
+      <div class="card" style="padding:8px 10px;margin-top:8px;font-size:11px" x-show="igOk">Created <strong x-text="igOk?.record_id"></strong> — <span x-text="igOk?.name"></span></div>
+
+      <div style="border-top:.5px solid var(--brd);margin-top:20px;padding-top:16px">
+        <div class="section-title">Bulk ingest from JSON file</div>
+        <div class="file-wrap">
+          <input type="file" accept="application/json,.json" @change="handleFile($event)" x-ref="fileInput">
+          <div class="file-label"><i class="ti ti-upload" style="font-size:14px" aria-hidden="true"></i>Choose JSON file</div>
+          <span class="file-name" x-text="bulkFileName||''"></span>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn" @click="submitFile()" :disabled="bulkLoading||!bulkItems" x-text="bulkLoading?'Submitting...':bulkItems?`Submit ${bulkItems.length} leads`:'No file loaded'"></button>
+        </div>
+        <div class="err" x-show="bulkErr" x-text="bulkErr"></div>
+        <div style="font-size:11px;color:var(--t2);margin-top:6px" x-show="bulkSum" x-text="bulkSum"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DEDUPE ==================== -->
+  <div x-show="tab==='dedupe'" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div class="bar">
+      <button class="btn" @click="runDedupe()" :disabled="ddLoading" x-text="ddLoading?'Scanning...':'Run dedupe scan'"></button>
+
+      <div style="display:flex;align-items:center;gap:6px">
+        <label class="toggle"><input type="checkbox" x-model="ddLlm"><span class="slider"></span></label>
+        <span style="font-size:11px;color:var(--t1)">LLM Filter</span>
+      </div>
+
+      <select style="width:140px" x-model="ddMethodFilter" @change="ddPage=1">
+        <option value="">All methods</option>
+        <option value="phone_blocking">phone_blocking</option>
+        <option value="email_blocking">email_blocking</option>
+        <option value="fuzzy_similarity">fuzzy_similarity</option>
+        <option value="llm_name_match">llm_name_match</option>
+      </select>
+
+      <span style="font-size:11px;color:var(--tm);margin-left:auto" x-show="ddAll.length" x-text="`${filteredDedupe().length} pairs (${ddAll.length} total)`"></span>
+    </div>
+
+    <!-- LLM summary card — muncul hanya setelah LLM filter dijalankan -->
+    <div class="summary-card" x-show="ddSummary">
+      <div style="font-size:10px;font-weight:600;color:var(--acc);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">LLM Name-Match Summary</div>
+      <div style="font-size:11px;color:var(--t2);line-height:1.7" x-text="ddSummary"></div>
+    </div>
+
+    <div style="flex:1;overflow:auto;padding:0 16px">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th style="min-width:200px">Lead 1</th>
+            <th style="min-width:200px">Lead 2</th>
+            <th style="min-width:80px">Score</th>
+            <th style="min-width:120px">Method</th>
+            <th style="min-width:220px" x-show="ddSummary">LLM Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr x-show="!ddAll.length"><td colspan="5" style="color:var(--tm);padding:16px">No scan run yet.</td></tr>
+          <template x-for="c in paginatedDedupe()" :key="c.lead_a.record_id+c.lead_b.record_id">
+            <tr>
+              <td style="white-space:normal;max-width:240px">
+                <div x-text="c.lead_a.name||c.lead_a.record_id"></div>
+                <div style="font-size:10px;color:var(--tm)" x-text="c.lead_a.company_name||'—'"></div>
+                <span class="badge b-n" style="margin-top:2px" x-text="c.lead_a.lead_status||'—'"></span>
+              </td>
+              <td style="white-space:normal;max-width:240px">
+                <div x-text="c.lead_b.name||c.lead_b.record_id"></div>
+                <div style="font-size:10px;color:var(--tm)" x-text="c.lead_b.company_name||'—'"></div>
+                <span class="badge b-n" style="margin-top:2px" x-text="c.lead_b.lead_status||'—'"></span>
+              </td>
+              <td><span class="badge" :class="c.similarity_score>=95?'b-acc':'b-n'" x-text="Math.round(c.similarity_score)+'%'"></span></td>
+              <td style="font-size:10px;color:var(--t2)" x-text="c.method"></td>
+              <!-- Reason kolom: hanya tampil untuk llm_name_match, kosong untuk yg lain -->
+              <td x-show="ddSummary" style="white-space:normal;font-size:10px;color:var(--tm);max-width:260px" x-text="c.method==='llm_name_match'?(c.explanation||'—'):'—'"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="foot" x-show="filteredDedupe().length>ddPs">
+      <span x-text="`Page ${ddPage}`"></span>
+      <div style="display:flex;gap:6px">
+        <button class="btn-s" @click="ddPage--" :disabled="ddPage<=1">Prev</button>
+        <button class="btn-s" @click="ddPage++" :disabled="ddPage*ddPs>=filteredDedupe().length">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== EXTRACT ==================== -->
+  <div x-show="tab==='extract'" class="main" style="padding:16px">
+    <div style="max-width:420px">
+      <div class="card" style="padding:10px;margin-bottom:14px">
+        <label>Look up by record ID</label>
+        <div style="display:flex;gap:6px">
+          <input placeholder="100234811" x-model="exId">
+          <button class="btn-s" @click="exById()">Look up</button>
+        </div>
+      </div>
+      <label>Raw text</label>
+      <textarea rows="3" x-model="exText" placeholder="Met him at the SFF booth, scanned our QR code"></textarea>
+      <button class="btn" style="margin-top:10px" @click="exRun()">Extract</button>
+      <div class="card" style="padding:10px;margin-top:10px" x-show="exRes">
+        <span class="badge b-acc" x-text="exRes?.channel"></span>
+        <div style="font-size:11px;color:var(--t2);margin-top:6px" x-text="exRes?.detail"></div>
+      </div>
+      <div class="err" x-show="exErr" x-text="exErr"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function app(){
+  const A='/api/leads';
+  return{
+    tab:'leads',
+
+    leads:[],loading:false,total:0,page:1,ps:15,
+    f:{q:'',lead_status:'',country_region:'',contact_owner:''},
+    fo:{statuses:[],countries:[]},
+
+    editId:null,editData:{},editExtract:null,
+
+    ig:{name:'',company:'',email:'',phone:'',country:'',form_id:'',form_name:'',page_url:'',message:''},
+    igOk:null,igErr:null,
+    bulkItems:null,bulkFileName:null,bulkLoading:false,bulkErr:null,bulkSum:null,
+
+    ddAll:[],ddLoading:false,ddLlm:false,ddMethodFilter:'',ddPage:1,ddPs:6,ddSummary:null,
+
+    exText:'',exRes:null,exId:'',exErr:null,
+
+    async init(){
+      this.go();
+      const r=await fetch(`${A}/filters`);
+      this.fo=await r.json();
+    },
+
+    async go(){
+      this.loading=true;
+      const p=new URLSearchParams({page:this.page,page_size:this.ps});
+      for(const[k,v]of Object.entries(this.f))if(v)p.set(k,v);
+      try{const r=await fetch(`${A}?${p}`);const d=await r.json();this.leads=d.results;this.total=d.total}
+      finally{this.loading=false}
+    },
+
+    startEdit(lead){
+      this.editId=lead.record_id;
+      this.editData={...lead};
+      this.editExtract=null;
+    },
+
+    async saveEdit(){
+      const body={lead_status:this.editData.lead_status,contact_owner:this.editData.contact_owner,notes:this.editData.notes};
+      await fetch(`${A}/${this.editData.record_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      this.editId=null;this.go();
+    },
+
+    async extractForEdit(){
+      const r=await fetch(`${A}/${this.editData.record_id}/extract-source`);
+      const d=await r.json();
+      this.editExtract=`${d.channel} — ${d.detail}`;
+    },
+
+    async exportCsv(){
+      const p=new URLSearchParams();
+      for(const[k,v]of Object.entries(this.f))if(v)p.set(k,v);
+      const r=await fetch(`${A}/export?${p}`);
+      const b=await r.blob();
+      const u=URL.createObjectURL(b);
+      const a=document.createElement('a');a.href=u;a.download='leads_export.csv';
+      document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);
+    },
+
+    async submitSingle(){
+      this.igErr=null;this.igOk=null;
+      const payload={...this.ig,submitted_at:new Date().toISOString()};
+      const r=await fetch(`${A}/ingest`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      if(!r.ok){this.igErr='Failed — check required fields.';return}
+      this.igOk=await r.json();this.go();
+    },
+
+    handleFile(ev){
+      this.bulkErr=null;this.bulkSum=null;this.bulkItems=null;this.bulkFileName=null;
+      const file=ev.target.files[0];if(!file)return;
+      this.bulkFileName=file.name;
+      file.text().then(t=>{
+        try{const items=JSON.parse(t);if(!Array.isArray(items))throw 0;this.bulkItems=items}
+        catch(e){this.bulkErr='Invalid file — must be a JSON array.';this.bulkFileName=null}
+      });
+    },
+
+    async submitFile(){
+      if(!this.bulkItems)return;
+      this.bulkLoading=true;this.bulkErr=null;this.bulkSum=null;
+      let ok=0,fail=0;
+      try{
+        for(const item of this.bulkItems){
+          const p={...item,submitted_at:item.submitted_at||new Date().toISOString()};
+          const r=await fetch(`${A}/ingest`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
+          r.ok?ok++:fail++;
+        }
+      }finally{
+        this.bulkLoading=false;
+        this.bulkSum=`${ok} created, ${fail} failed out of ${this.bulkItems.length}.`;
+        this.bulkItems=null;this.bulkFileName=null;this.go();
+      }
+    },
+
+    async runDedupe(){
+      this.ddLoading=true;this.ddPage=1;this.ddSummary=null;
+      try{
+        const r=await fetch(`${A}/dedupe-candidates`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({use_llm_justification:this.ddLlm})});
+        const d=await r.json();
+        this.ddAll=d.candidates;
+        this.ddSummary=d.llm_summary||null;
+      }finally{this.ddLoading=false}
+    },
+
+    filteredDedupe(){
+      if(!this.ddMethodFilter)return this.ddAll;
+      return this.ddAll.filter(c=>c.method===this.ddMethodFilter);
+    },
+    paginatedDedupe(){
+      const s=(this.ddPage-1)*this.ddPs;
+      return this.filteredDedupe().slice(s,s+this.ddPs);
+    },
+
+    async exRun(){
+      this.exErr=null;this.exRes=null;
+      const r=await fetch(`${A}/extract-structured`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:this.exText})});
+      this.exRes=await r.json();
+    },
+    async exById(){
+      this.exErr=null;this.exRes=null;
+      if(!this.exId){this.exErr='Enter a record ID.';return}
+      const r=await fetch(`${A}/${this.exId}/extract-source`);
+      if(!r.ok){this.exErr=`Lead '${this.exId}' not found.`;return}
+      this.exRes=await r.json();
+    },
+  }
+}
+</script>
+</body>
+</html>
