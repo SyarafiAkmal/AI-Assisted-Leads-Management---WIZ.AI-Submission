@@ -274,8 +274,8 @@ docker exec -it -w /app leads-backend pytest tests/test_unit.py -v
 
 ## What I'd Do Next
 
-- **`GET /dashboard`** — lead counts by status and by source channel. Out of scope for this submission but straightforward to add as an aggregation query.
 - **Merge action on confirmed duplicates** — the current endpoint surfaces candidates; a `POST /leads/merge` that picks the canonical record and redirects the other would complete the dedup workflow.
 - **Incremental dedup on ingest** — currently dedup is batch-only. On ingest, only an exact email check is done. A lightweight candidate check (phone + fuzzy name) at ingest time would catch duplicates as they come in rather than in batch.
 - **Smarter LLM batching for extraction** — the extraction pipeline currently processes one record at a time. Batch extraction (similar to the dedup LLM pass) would reduce cost significantly if run across the full dataset.
+- **Dedicated AI Dataset Cleaning Model** — there are multiple columns containing null values, a good dataset cleaning would be to fill them appropriately instead of removing them. A simple AI model that could classify the origins based on text input (usually BERT language models) and scoring system using regression model is a primary example.
 - **Pagination on export** — current CSV export loads all matching rows into memory at once. For larger datasets, a streaming response would be more appropriate.
