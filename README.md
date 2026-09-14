@@ -79,6 +79,9 @@ The frontend is a single-page app served at `http://localhost:8000`, built with 
 | **Look up by record ID** | Enter a `record_id` (e.g. `100234811`) in the top card and click **Look up**. The system fetches that lead's notes and original_source from the database and runs the 3-layer extraction pipeline. The result shows the detected channel badge and detail text. | ![Extract by ID](backend/docs/extract_id.png) |
 | **Extract from raw text** | Type or paste any text into the **Raw text** textarea and click **Extract**. Useful for testing extraction on arbitrary text without needing a database record. | ![Extract from text](backend/docs/extract_text.png) |
 ---
+### Dashboard Tab
+A simple dashboard containing aggregation data (count and group by).
+![Dashboard](backend/docs/simple_dashboard.png)
 
 ## Project Structure
 
@@ -128,6 +131,7 @@ submission/
 | `POST` | `/api/leads/dedupe-candidates` | Run deduplication pipeline, optionally with LLM pass |
 | `POST` | `/api/leads/extract-structured` | Extract source channel from raw text |
 | `GET` | `/api/leads/:id/extract-source` | Extract source for a specific lead by ID |
+| `GET` | `/api/leads/dashboard` | A simple aggregation count dashboard in a form of JSON |
 
 ---
 
